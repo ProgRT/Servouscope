@@ -1,0 +1,30 @@
+div#sudev {
+	display: grid;
+	grid-template-columns: auto 320px;
+}
+
+div#display {
+	grid-column: 1;
+}
+
+div#panel {
+	grid-column: 2;
+	padding: 4px;
+	border-radius: 3px;
+	box-shadow: 0px 0px 10px 0px gray;
+}
+
+div.dataSetBlock {
+	border: 1px solid gray;
+	border-radius: 5px;
+	margin-top: 5px;
+	width: auto;
+	cursor: default;
+}
+
+div.dataSetBlock:hover {
+	background-color: hsl(0, 0%, 90%);
+}
+div.dataSetBlock p {
+	margin: 4px;
+}
