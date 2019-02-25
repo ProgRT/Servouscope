@@ -79,8 +79,18 @@ function parse(string){
 			line = lines.shift();
 		}
 
+		line = lines.shift();
 		while(line = lines.shift()){
-			dataSet.data.push(line.split("\t"));
+			let d = line.split("\t");
+			let t = d[0].split(":");
+			var dataPoint = {
+				time: new Date(dataSet.date.getFullYear(), dataSet.date.getMonth(), dataSet.date.getDate(), t[0], t[1], t[2], t[3]),
+				phase: d[1],
+				pressure: parseFloat(d[2].replace(",", ".")),
+				flow: parseFloat(d[3].replace(",", ".")),
+				volume: parseFloat(d[4].replace(",", ".")),
+			}
+			dataSet.data.push(dataPoint);
 		}
 	}
 
@@ -93,7 +103,7 @@ function dataSetBlock(dataset){
 	block.className = "dataSetBlock";
 
 	var pd = document.createElement("p"); var d = dataset.date;
-	var datestring = d.toISOString().split("T")[0];
+	var datestring = d.toISOString().split(".")[0].replace("T", " ");
 	pd.textContent = datestring;
 
 

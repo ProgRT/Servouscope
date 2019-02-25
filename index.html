@@ -1,13 +1,19 @@
 <!DOCTYPE html>
 <meta charset='UTF-8' />
 <link rel="stylesheet" href="style.css" />
+<link rel="stylesheet" href="css/gs.css" />
 
 <div id="sudev">
 	<div id="panel">
 		<input type='file' id='fileInput' multiple />
 		<div id="dataSetsList"></div>
 	</div>
-	<div id="display"></div>
+	<div id="display">
+		<svg id="pressure"></svg>
+		<svg id="flow"></svg>
+	</div>
 </div>
-<!--script src="./lib/d3.v5.min.js"></script-->
+
+<script src="./lib/d3.v3.min.js"></script>
+<script src="./lib/graphsimple.js"></script>
 <script type="module" src="app.js"></script>
