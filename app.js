@@ -5,7 +5,6 @@ gs.defaults.margeB = 60;
 gs.defaults.padH = 0.1;
 gs.defaults.padB = 0.1;
 
-var dataSets = [];
 var dataSetsList = document.querySelector("div#dataSetsList");
 const fileInput = document.getElementById("fileInput");
 
@@ -14,9 +13,22 @@ function fileLoadedHandler(e){
 	var ds = parse(str);
 	var block = dataSetBlock(ds);
 
+	block.addEventListener("click", (e)=>{
+
+		for (let b of dataSetsList.childNodes){
+			b.classList.remove("selected");
+		}
+
+		if(e.target.nodeName == "P"){ e.target.parentNode.classList.add("selected"); }
+		else{ e.target.classList.add("selected"); }
+		display(ds);
+	});
+
 	dataSetsList.appendChild(block);
-	dataSets.push(ds);
-	display(ds);
+	if(dataSetsList.childNodes.length == 1){
+		display(ds)
+		block.classList.add("selected");
+	};
 }
 
 function read(file){
@@ -59,8 +71,13 @@ function display(dataSet){
 }
 
 fileInput.addEventListener("change", function(){
-	dataSets = [];
 	dataSetsList.innerHTML = null;
 
 	for(var file of this.files){read(file);}
+});
+
+window.addEventListener("load", function(){
+	dataSetsList.innerHTML = null;
+
+	for(var file of fileInput.files){read(file);}
 });

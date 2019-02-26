@@ -31,7 +31,8 @@ div#panel {
 	/*border: 1px dashed blue;*/
 }
 
-div.dataSetBlock {
+a.dataSetBlock {
+	display: block;
 	border: 1px solid gray;
 	border-radius: 5px;
 	margin-top: 5px;
@@ -39,10 +40,10 @@ div.dataSetBlock {
 	cursor: default;
 }
 
-div.dataSetBlock:hover {
+a.dataSetBlock:hover, a.dataSetBlock.selected {
 	background-color: hsl(0, 0%, 90%);
 }
-div.dataSetBlock p {
+a.dataSetBlock p {
 	margin: 4px;
 }
 

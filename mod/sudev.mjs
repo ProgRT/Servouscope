@@ -99,7 +99,7 @@ function parse(string){
 
 function dataSetBlock(dataset){
 
-	var block = document.createElement("div");
+	var block = document.createElement("a");
 	block.className = "dataSetBlock";
 
 	var pd = document.createElement("p"); var d = dataset.date;
