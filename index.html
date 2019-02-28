@@ -1,18 +1,29 @@
 <!DOCTYPE html>
 <meta charset='UTF-8' />
-<link rel="stylesheet" href="style.css" />
+<link rel="stylesheet" href="css/layout.css" />
 <link rel="stylesheet" href="css/gs.css" />
 
+
+<header>
+	<h1>Servouscope</h1>
+	<p class="subtitle">
+	Visualisateur pour données exportées du ventilateur Servo-u.
+	</p>
+	<input type='file' id='fileInput' multiple />
+</header>
+
 <div id="sudev">
-	<div id="panel">
-		<input type='file' id='fileInput' multiple />
-		<div id="dataSetsList"></div>
-	</div>
 	<div id="display">
 		<svg id="pressure"></svg>
 		<svg id="flow"></svg>
 	</div>
+	<div id="panel">
+	</div>
 </div>
+
+<footer>
+		<div id="dataSetsList"></div>
+</footer>
 
 <script src="./lib/d3.v3.min.js"></script>
 <script src="./lib/graphsimple.js"></script>

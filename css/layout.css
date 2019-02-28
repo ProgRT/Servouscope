@@ -1,0 +1,65 @@
+html {
+  height: 100%; }
+
+body {
+  margin: 0px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  font-family: sans-serif;
+  transition: all 1s; }
+
+h1 {
+  margin: 0px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  font-weight: normal; }
+
+input {
+  padding-top: 10px;
+  width: 20em; }
+
+#dataSetsList {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  padding: 10px; }
+  #dataSetsList a {
+    border: 1px solid silver;
+    padding-left: 8px;
+    padding-right: 8px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    transition: all 0.5s; }
+    #dataSetsList a p {
+      margin-top: 4px;
+      margin-bottom: 4px; }
+  #dataSetsList a:hover, #dataSetsList a.selected {
+    background: #e6e6e6; }
+
+header {
+  margin: 0px;
+  display: flex;
+  justify-content: space-between;
+  border: 1px solid silver;
+  padding-left: 10px; }
+
+body:not(.landing) .subtitle {
+  display: none; }
+
+body.landing {
+  justify-content: center; }
+  body.landing header {
+    text-align: center;
+    display: block;
+    border: none; }
+  body.landing div#sudev, body.landing footer {
+    display: none; }
+  body.landing h1 {
+    margin-bottom: 5px;
+    font-size: 60px; }
+  body.landing p.subtitle {
+    margin-top: 5px;
+    margin-bottom: 40px;
+    font-size: 14px; }

@@ -15,20 +15,19 @@ function fileLoadedHandler(e){
 
 	block.addEventListener("click", (e)=>{
 
-		for (let b of dataSetsList.childNodes){
-			b.classList.remove("selected");
-		}
+		for (let b of dataSetsList.childNodes){ b.classList.remove("selected"); }
 
 		if(e.target.nodeName == "P"){ e.target.parentNode.classList.add("selected"); }
 		else{ e.target.classList.add("selected"); }
+
 		display(ds);
 	});
 
-	dataSetsList.appendChild(block);
-	if(dataSetsList.childNodes.length == 1){
-		display(ds)
-		block.classList.add("selected");
-	};
+	for (let b of dataSetsList.childNodes){ b.classList.remove("selected"); }
+
+	dataSetsList.prepend(block);
+	display(ds)
+	block.classList.add("selected");
 }
 
 function read(file){
@@ -74,10 +73,13 @@ fileInput.addEventListener("change", function(){
 	dataSetsList.innerHTML = null;
 
 	for(var file of this.files){read(file);}
+	if(fileInput.files.length == 0){document.body.classList.add("landing")}
+	else{document.body.classList.remove("landing")}
 });
 
 window.addEventListener("load", function(){
 	dataSetsList.innerHTML = null;
 
 	for(var file of fileInput.files){read(file);}
+	if(fileInput.files.length == 0){document.body.classList.add("landing")}
 });
