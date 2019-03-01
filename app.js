@@ -1,4 +1,4 @@
-import {parse, dataSetBlock} from "./mod/sudev.mjs";
+import {parse, dataSetBlock, table} from "./mod/sudev.mjs";
 
 gs.defaults.margeG = 70;
 gs.defaults.margeB = 60;
@@ -66,7 +66,24 @@ function display(dataSet){
 	graph.tracer(dataSet.data, fx, fy)
 		.setidx("Temps (s)")
 		.setidy("Débit (l/s)");
-	
+
+	var panel = document.querySelector("#panel");
+	panel.innerHTML = null;
+
+	var caption = document.createElement("caption");
+	caption.textContent = "Paramètres";
+
+	var t = table(dataSet.params);
+	t.prepend(caption);
+	panel.appendChild(t);
+
+	/*
+	var h2 = document.createElement("h2");
+	h2.textContent = "Plus";
+
+	panel.appendChild(h2);
+	panel.appendChild(table(dataSet.unparsedLines));
+	*/
 }
 
 fileInput.addEventListener("change", function(){

@@ -70,7 +70,28 @@ function parse(string){
 					dataSet.params.push(param);
 					break;
 
+				case "Ti":
+					dataSet.params.push(param);
+					break;
+
+				case "Volume courant":
+					dataSet.params.push(param);
+					break;
+
+				case "F resp.":
+					dataSet.params.push(param);
+					break;
+
+				case "Trigger en pression":
+					dataSet.params.push(param);
+					break;
+
+				case "Conc. O2":
+					dataSet.params.push(param);
+					break;
+
 					// Other things
+
 				default :
 					dataSet.unparsedLines.push(param);
 					break;
@@ -116,4 +137,24 @@ function dataSetBlock(dataset){
 	return block;
 }
 
-export {parse, dataSetBlock};
+function table(data){
+
+	var table = document.createElement("table");
+	table.classList.add("params");
+
+	for (var row of data){
+		var tr = document.createElement("tr");
+
+		for (var item of row){
+			var td = document.createElement("td");
+			td.textContent = item;
+			tr.appendChild(td);
+		}
+
+		table.appendChild(tr);
+	}
+	
+	return table;
+}
+
+export {parse, dataSetBlock, table};
