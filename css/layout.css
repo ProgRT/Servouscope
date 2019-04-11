@@ -57,9 +57,7 @@ div#sudev {
   display: flex; }
 
 div#panel {
-  flex-grow: 200;
   flex-shrink: 1;
-  flex-basis: 300px;
   margin-left: 10px;
   margin-right: 10px; }
 
@@ -96,3 +94,5 @@ body.landing {
     margin-top: 5px;
     margin-bottom: 40px;
     font-size: 14px; }
+
+/*# sourceMappingURL=layout.css.map */
