@@ -2,7 +2,7 @@ import {parse, dataSetBlock, table} from "./mod/sudev.mjs";
 
 gs.defaults.margeG = 70;
 gs.defaults.margeB = 60;
-gs.defaults.padH = 0.1;
+gs.defaults.padH = 0.2;
 gs.defaults.padB = 0.1;
 
 var dataSetsList = document.querySelector("div#dataSetsList");
@@ -58,6 +58,11 @@ function display(dataSet){
 		.setidx("Temps (s)")
 		.setidy("Pression (cmH₂O)");
 
+	var triggers = dataSet.data.filter(d=>d.trigger == "Pression");
+	for(var t of triggers){
+		graph.etiquette(fx(t), graph.ymin /2, "↑");
+	}
+
 	var fy = (d)=>d.flow;
 
 	document.querySelector("#flow").innerHTML = null;
@@ -66,6 +71,11 @@ function display(dataSet){
 	graph.tracer(dataSet.data, fx, fy)
 		.setidx("Temps (s)")
 		.setidy("Débit (l/s)");
+
+	var triggers = dataSet.data.filter(d=>d.trigger == "Débit");
+	for(var t of triggers){
+		graph.etiquette(fx(t), graph.ymin /2, "↑");
+	}
 
 	var panel = document.querySelector("#panel");
 	panel.innerHTML = null;

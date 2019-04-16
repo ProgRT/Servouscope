@@ -111,6 +111,7 @@ function parse(string){
 				flow: parseFloat(d[3].replace(",", ".")),
 				volume: parseFloat(d[4].replace(",", ".")),
 			}
+			if(d[5]){dataPoint.trigger = d[5]}
 			dataSet.data.push(dataPoint);
 		}
 	}
