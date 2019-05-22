@@ -77,6 +77,23 @@ function display(dataSet){
 		graph.etiquette(fx(t), graph.ymin /2, "↑");
 	}
 
+	document.querySelector("#eadi").innerHTML = null;
+	document.querySelector("#eadi").classList.remove("gs");
+	if(dataSet.hasEadi){
+		var fy = (d)=>d.eadi;
+
+		var graph = new gs.graph("#eadi");
+		graph.setscale(dataSet.data, fx, fy);
+		graph.tracer(dataSet.data, fx, fy)
+			.setidx("Temps (s)")
+			.setidy("Edi (µV)");
+
+		var triggers = dataSet.data.filter(d=>d.trigger == "Edi");
+		for(var t of triggers){
+			graph.etiquette(fx(t), graph.ymin /2, "↑");
+		}
+	}
+
 	var panel = document.querySelector("#panel");
 	panel.innerHTML = null;
 

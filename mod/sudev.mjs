@@ -90,6 +90,14 @@ function parse(string){
 					dataSet.params.push(param);
 					break;
 
+				case "Niveau NAVA":
+					dataSet.params.push(param);
+					break;
+
+				case "Trigger Edi":
+					dataSet.params.push(param);
+					break;
+
 					// Other things
 
 				default :
@@ -100,7 +108,14 @@ function parse(string){
 			line = lines.shift();
 		}
 
-		line = lines.shift();
+		console.table(dataSet.unparsedLines);
+
+		dataSet.monitoredParams= lines.shift().split("\t");
+		if(dataSet.monitoredParams[5] == "Edi (uV)"){
+			dataSet.hasEadi = true;
+		}
+		var trigPos = dataSet.monitoredParams.length - 1;
+
 		while(line = lines.shift()){
 			let d = line.split("\t");
 			let t = d[0].split(":");
@@ -111,7 +126,8 @@ function parse(string){
 				flow: parseFloat(d[3].replace(",", ".")),
 				volume: parseFloat(d[4].replace(",", ".")),
 			}
-			if(d[5]){dataPoint.trigger = d[5]}
+			if(dataSet.hasEadi){dataPoint.eadi = parseFloat(d[5].replace(",", "."))}
+			if(d[trigPos]){dataPoint.trigger = d[trigPos]}
 			dataSet.data.push(dataPoint);
 		}
 	}
