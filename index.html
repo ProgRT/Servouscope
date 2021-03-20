@@ -1,33 +1,24 @@
 <!DOCTYPE html>
 <meta charset='UTF-8' />
 <title>Servouscope</title>
-<link rel="stylesheet" href="css/layout.css" />
-<link rel="stylesheet" href="css/gs.css" />
+
 <link rel="icon" type="image/png" href="logo.svg.png" />
+<link rel="stylesheet" href="css/app2.css" />
 
-
-<header>
-	<h1><img src="logo.svg" /> Servouscope</h1>
-	<p class="subtitle">
-	Visualisateur pour données exportées du ventilateur Servo-u.
-	</p>
-	<input type='file' id='fileInput' multiple />
-</header>
-
-<div id="sudev">
-	<div id="display">
-		<svg id="pressure"></svg>
-		<svg id="flow"></svg>
-		<svg id="eadi"></svg>
+<template id='logo'>
+	<div>
+		<h1>
+			<img src="logo.svg"/>
+			Servouscope
+		</h1>
+		<p class="subtitle">
+		Visualisateur pour données exportées du ventilateur Servo-u.
+		</p>
 	</div>
-	<div id="panel">
-	</div>
-</div>
-
-<footer>
-		<div id="dataSetsList"></div>
-</footer>
+</template>
 
 <script src="./lib/d3.v3.min.js"></script>
-<script src="./lib/graphsimple.js"></script>
-<script type="module" src="app.js"></script>
+<script type="module">
+	import {sudev} from './mod/sudev.mjs';
+	var disp = new sudev('body');
+</script>
