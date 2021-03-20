@@ -41,8 +41,7 @@ export class sudev {
 			for (var but of this.filesList.querySelectorAll('button')){
 				but.disabled = false;
 			}
-			if(e.target.tagName == 'P'){e.target.parentNode.disabled = true}
-			else{e.target.disabled = true}
+			e.target.disabled = true;
 			this.display.display(ds);
 		});
 		this.filesList.appendChild(dsb);
@@ -68,17 +67,9 @@ function dataSetBlock(dataset){
 	var block = document.createElement("button");
 	block.className = "dataSetBlock";
 
-	var pd = document.createElement("p"); var d = dataset.date;
 	var datestring = d.toISOString().split(".")[0].replace("T", " ");
-	pd.textContent = datestring;
 
-
-	var pm = document.createElement("p"); var d = dataset.date;
-	pm.textContent = dataset.mode;
-
-	block.appendChild(pd);
-	block.appendChild(pm);
+	block.innerHTML = datestring + '<br/>' + dataset.mode;
 
 	return block;
 }
-
