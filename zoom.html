@@ -5,6 +5,15 @@
 <link rel="icon" type="image/png" href="logo.svg.png" />
 <link rel="stylesheet" href="css/app2.css" />
 
+<style>
+	rect {
+		fill: black;
+		opacity: 0.14;
+	}
+	#plageGroup line {
+		display: none;
+	}
+</style>
 <template id='logo'>
 	<div>
 		<h1>
@@ -20,5 +29,14 @@
 <script src="./lib/d3.v3.min.js"></script>
 <script type="module">
 	import {sudev} from './mod/sudev.mjs';
-	var disp = new sudev('body', {multiple: true});
+	let param = {
+		dParams: {
+			zoomable: true,
+			params: [
+				'PRESSION',
+				'DÉBIT'
+			]
+		}
+	};
+	var disp = new sudev('body', param);
 </script>

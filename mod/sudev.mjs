@@ -1,8 +1,24 @@
 import {display} from './display.mjs';
 import {dataset} from './dataset.mjs';
 
+let defaults = {
+	dParams: {
+	}
+};
+
 export class sudev {
-	constructor(target){
+	constructor(target, param){
+
+		if(param){
+			for(var i in param){
+				this[i] = param [i];
+			}
+		}
+
+		for(var i in defaults){
+			if(!this[i]){this[i] = defaults[i]}
+		}
+
 		this.target = document.querySelector(target);
 		this.target.classList.add('landing');
 
@@ -13,7 +29,11 @@ export class sudev {
 		this.filesSelector = document.createElement('input');
 		this.filesSelector.type = 'file';
 		this.filesSelector.id = 'suvedFilesSelect';
-		this.filesSelector.multiple = true;
+
+		if(this.multiple){
+			this.filesSelector.multiple = true;
+		}
+
 		this.filesSelector.addEventListener("change", this.fileInputHandler);
 		this.header.appendChild(this.filesSelector);
 
@@ -21,12 +41,11 @@ export class sudev {
 		let templateClone = logoTemplate.content.firstElementChild.cloneNode(true);
 		this.header.appendChild(templateClone);
 		
-		this.display = new display(target); 
+		this.display = new display(target, this.dParams); 
 
 		this.filesList = document.createElement('div');
 		this.filesList.id = 'sudevFilesList';
 		this.target.appendChild(this.filesList);
-
 
 		this.datasets = [];
 	}
@@ -36,15 +55,18 @@ export class sudev {
 		var ds = new dataset(str);
 		this.datasets.push(ds);
 		this.display.display(ds);
-		var dsb = dataSetBlock(ds);
-		dsb.addEventListener('click', (e)=>{
-			for (var but of this.filesList.querySelectorAll('button')){
-				but.disabled = false;
-			}
-			e.target.disabled = true;
-			this.display.display(ds);
-		});
-		this.filesList.appendChild(dsb);
+
+		if(this.multiple){
+			var dsb = dataSetBlock(ds);
+			dsb.addEventListener('click', (e)=>{
+				for (var but of this.filesList.querySelectorAll('button')){
+					but.disabled = false;
+				}
+				e.target.disabled = true;
+				this.display.display(ds);
+			});
+			this.filesList.appendChild(dsb);
+		}
 	}
 
 	updateFilesList() {
@@ -67,7 +89,7 @@ function dataSetBlock(dataset){
 	var block = document.createElement("button");
 	block.className = "dataSetBlock";
 
-	var datestring = d.toISOString().split(".")[0].replace("T", " ");
+	var datestring = dataset.date.toISOString().split(".")[0].replace("T", " ");
 
 	block.innerHTML = datestring + '<br/>' + dataset.mode;
 

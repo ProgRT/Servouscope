@@ -51,6 +51,12 @@ export class graph {
 				if('viewBox' in this){
 					this.svg.attr('viewBox', this.viewBox);
 				}
+
+				let o = new ResizeObserver(this.redessiner);
+				let elem = document.querySelector(this.idsvg);
+				let pelem = elem.parentElement;
+				o.observe(pelem);
+
 				this.gridGroup = this.svg.append("g")
 					.attr("id", "gridGroup");
 
@@ -135,7 +141,6 @@ export class graph {
 						.text('T')
 						.on('click', function(){alert('Allo !')});
 				}
-				addEventListener('resize', ()=>this.redessiner());
 		  }
 
 		  setRanges () {
@@ -178,73 +183,71 @@ export class graph {
 					 return this;
 		  }
 
-		  SetScale () {
-					 this.echellex = d3.scale.linear()
-								.domain([this.xmin, this.xmax])
-								.range(this.rangeX);
+	SetScale () {
+		this.echellex = d3.scale.linear()
+			.domain([this.xmin, this.xmax])
+			.range(this.rangeX);
 
-					 this.echelley = d3.scale.linear()
-								.domain([this.ymin, this.ymax])
-								.range(this.rangeY);
-					 return this;
-		  }
+		this.echelley = d3.scale.linear()
+			.domain([this.ymin, this.ymax])
+			.range(this.rangeY);
+		return this;
+	}
 
-		  setscale (d, fx, fy){
+	setscale (d, fx, fy){
+		this.setDomain(d, fx, fy);
+		this.setRanges();
+		this.SetScale();
+		return this;
+	}
 
-					 this.setDomain(d, fx, fy);
-					 this.setRanges();
-					 this.SetScale();
-					 return this;
-		  }
+	getlf (fx, fy){
+		this.lf = d3.svg.line()
+			.x(function(d) {return this.echellex(fx(d))})
+			.y(function(d) {return this.echelley(fy(d))})
+			.interpolate("linear");
+	}
 
-		  getlf (fx, fy){
+	getsf (d, fx, fy){
+		this.sf = d3.svg.area()
+			.x(function(d) {return this.echellex(fx(d))})
+			.y0(function(d) {return this.echelley(0)})
+			.y1(function(d) {return this.echelley(fy(d))})
+			.interpolate("linear");
+	}
 
-					 this.lf = d3.svg.line()
-								.x(function(d) {return this.echellex(fx(d))})
-								.y(function(d) {return this.echelley(fy(d))})
-								.interpolate("linear");
-		  }
+	drawgrids () {
+		if(!("gridY"in this)){
+			this.drawGridY();
+		}
 
-		  getsf (d, fx, fy){
+		if(!("gridX"in this)){
+			this.drawGridX();
+		}
 
-					 this.sf = d3.svg.area()
-								.x(function(d) {return this.echellex(fx(d))})
-								.y0(function(d) {return this.echelley(0)})
-								.y1(function(d) {return this.echelley(fy(d))})
-								.interpolate("linear");
-		  }
+	}
 
-		  drawgrids () {
-					 if(!("gridY"in this)){
-								this.drawGridY();
-					 }
-
-					 if(!("gridX"in this)){
-								this.drawGridX();
-					 }
-
-		  }
-
-			Autoscale (){
-					  var lastData = this.donnees[this.donnees.length -1];
-					  if('xmin' in this){
-								if(d3.max(lastData.donnees, lastData.fy) > this.ymax){
-										  this.ymax = d3.max(lastData.donnees, lastData.fy);
-										  if(this.padH != 0){
-													 this.ymax += this.padH * (this.ymax - this.ymin);
-										  }
-								}
-
-								if(d3.min(lastData.donnees, lastData.fy) < this.ymin){
-										  this.ymin = d3.min(lastData.donnees, lastData.fy);
-										  if(this.padB != 0){
-													 this.ymin += this.padH * (this.ymin - this.ymax);
-										  }
-								}
-
-								 this.redessiner();
-					  }
+	Autoscale (){
+		var lastData = this.donnees[this.donnees.length -1];
+		if('xmin' in this){
+			if(d3.max(lastData.donnees, lastData.fy) > this.ymax){
+				this.ymax = d3.max(lastData.donnees, lastData.fy);
+				if(this.padH != 0){
+					this.ymax += this.padH * (this.ymax - this.ymin);
+				}
 			}
+
+			if(d3.min(lastData.donnees, lastData.fy) < this.ymin){
+				this.ymin = d3.min(lastData.donnees, lastData.fy);
+				if(this.padB != 0){
+					this.ymin += this.padH * (this.ymin - this.ymax);
+				}
+			}
+
+			this.redessiner();
+		}
+	}
+
 	AutoscaleAll (){
 		var lastData = this.donnees[this.donnees.length -1];
 		if('xmin' in this){
@@ -316,294 +319,300 @@ export class graph {
 		return this;
 	}
 
-		  redessiner(){
-					 this.setRanges();
-					 this.SetScale();
+	redessiner = ()=>{
+		this.setRanges();
+		this.SetScale();
 
-					 this.drawGridX();
-					 this.drawGridY();
-					 this.setidx();
-					 this.setidy();
+		this.drawGridX();
+		this.drawGridY();
+		this.setidx();
+		this.setidy();
 
-					 for(var c of this.courbes){c.remove()}
-					 for(var v of this.vecteurs){this.vectDraw(v)}
-					 for(var e of this.etiquettes){this.etiqDraw(e)}
-					 for(var p of this.plagesx){this.plagexDraw(p)}
-					 for(var p of this.pointsy){this.pointyDraw(p)}
+		for(var c of this.courbes){c.remove()}
+		for(var v of this.vecteurs){this.vectDraw(v)}
+		for(var e of this.etiquettes){this.etiqDraw(e)}
+		for(var p of this.plagesx){this.plagexDraw(p)}
+		for(var p of this.pointsy){this.pointyDraw(p)}
 
-					 /*
-					 var d = this.donnees[this.donnees.length - 1];
-					 this.Tracer(d.donnees, d.fx, d.fy);
-					 */
-					 for(var d of this.donnees){
-								this.Tracer(d.donnees, d.fx, d.fy);
-					 }
-		  }
+		/*
+		 var d = this.donnees[this.donnees.length - 1];
+		 this.Tracer(d.donnees, d.fx, d.fy);
+	 */
 
-		  ajouter (donnees, fonctionx, fonctiony){
-					 this.getlf(fonctionx, fonctiony);
-					 this.getsf(donnees, fonctionx, fonctiony);
+		for(var d of this.donnees){
+			this.Tracer(d.donnees, d.fx, d.fy);
+		}
+	}
 
-					 var coord = this.lf(donnees, fonctionx, fonctiony);
+	ajouter (donnees, fonctionx, fonctiony){
+		this.getlf(fonctionx, fonctiony);
+		this.getsf(donnees, fonctionx, fonctiony);
 
-					 this.courbe2 = this.waveformGroup.append("path")
-								.attr("d", coord)
-								.style("clip-path", "url(#" + this.idsvg + "clip)")
-								.style("opacity", 0)
-								.classed('dataPath', true);
+		var coord = this.lf(donnees, fonctionx, fonctiony);
 
-					 this.courbe2.transition().duration(this.durAnim).style("opacity", 1);
+		this.courbe2 = this.waveformGroup.append("path")
+			.attr("d", coord)
+			.style("clip-path", "url(#" + this.idsvg + "clip)")
+			.style("opacity", 0)
+			.classed('dataPath', true);
 
-					 this.anotations.push(this.courbe2);
+		this.courbe2.transition().duration(this.durAnim).style("opacity", 1);
 
-					 return this;
-		  }
+		this.anotations.push(this.courbe2);
 
-		  raz (){
-					 for(i in this.anotations){
-								this.anotations[i].transition().duration(this.durAnim).style("opacity", 0);
-								this.anotations[i].transition().delay(this.durAnim).remove();
-					 }
-					 for(i in this.plages){
-								this.plages[i].ligne.transition().duration(this.durAnim).style("opacity", 0);
-								this.plages[i].texte.transition().duration(this.durAnim).style("opacity", 0);
-								this.plages[i].ligne.transition().delay(this.durAnim).remove();
-								this.plages[i].texte.transition().delay(this.durAnim).remove();
-					 }
-		  }
+		return this;
+	}
 
-		  tracerZeroX (){
-					 this.ligneZeroX = this.svg.append("line")
-								.attr("x1", this.margeG)
-								.attr("x2", this.width - this.margeD)
-								.attr("y1", this.echelley(0))
-								.attr("y2", this.echelley(0))
-								.attr("class", "ligneZero");
-		  }
+	raz (){
+		for(i in this.anotations){
+			this.anotations[i].transition().duration(this.durAnim).style("opacity", 0);
+			this.anotations[i].transition().delay(this.durAnim).remove();
+		}
 
-		  axes (){
-					 this.axex = this.svg.append("line")
-								.attr("x1", this.margeG)
-								.attr("x2", this.width - this.margeD)
-								.attr("y1", this.echelley(0))
-								.attr("y2", this.echelley(0))
-								.attr("class", "axe");
+		for(i in this.plages){
+			this.plages[i].ligne.transition().duration(this.durAnim).style("opacity", 0);
+			this.plages[i].texte.transition().duration(this.durAnim).style("opacity", 0);
+			this.plages[i].ligne.transition().delay(this.durAnim).remove();
+			this.plages[i].texte.transition().delay(this.durAnim).remove();
+		}
+	}
 
-					 this.axey = this.svg.append("line")
-								.attr("x1", this.echellex(0))
-								.attr("x2", this.echellex(0))
-								.attr("y1", this.height - this.margeB)
-								.attr("y2", this.margeH)
-								.attr("class", "axe");
+	tracerZeroX (){
+		this.ligneZeroX = this.svg.append("line")
+			.attr("x1", this.margeG)
+			.attr("x2", this.width - this.margeD)
+			.attr("y1", this.echelley(0))
+			.attr("y2", this.echelley(0))
+			.attr("class", "ligneZero");
+	}
 
-					 d3.selectAll(".axe").attr("style", "marker-end: url(#flechep);");
-		  }
+	axes (){
+		this.axex = this.svg.append("line")
+			.attr("x1", this.margeG)
+			.attr("x2", this.width - this.margeD)
+			.attr("y1", this.echelley(0))
+			.attr("y2", this.echelley(0))
+			.attr("class", "axe");
 
-		  zoomX (xmin, xmax) {
+		this.axey = this.svg.append("line")
+			.attr("x1", this.echellex(0))
+			.attr("x2", this.echellex(0))
+			.attr("y1", this.height - this.margeB)
+			.attr("y2", this.margeH)
+			.attr("class", "axe");
 
-					 this.echellex = d3.scale.linear()
-								.domain([0, 3])
-								.range([this.margeG + this.padG, this.width - (this.margeD + this.padD)]);
+		d3.selectAll(".axe").attr("style", "marker-end: url(#flechep);");
+	}
 
-					 this.getlf(this.fx, this.fy );
+	zoomX (xmin, xmax) {
 
-					 this.courbe.transition().duration(this.durAnim)
-								.attr("d", this.lf(this.donnees));
-		  }
+		this.echellex = d3.scale.linear()
+			.domain([0, 3])
+			.range([this.margeG + this.padG, this.width - (this.margeD + this.padD)]);
 
-		  vecteur ( x1, y1, x2, y2, options){
-					 var pad = this.padPlage;
-					 var vecteur = {x1: x1, y1: y1, x2: x2, y2: y2};
+		this.getlf(this.fx, this.fy );
 
-					 this.vectDraw(vecteur);
-					 this.vecteurs.push(vecteur);
+		this.courbe.transition().duration(this.durAnim)
+			.attr("d", this.lf(this.donnees));
+	}
 
-					 return this;
+	vecteur ( x1, y1, x2, y2, options){
+		var pad = this.padPlage;
+		var vecteur = {x1: x1, y1: y1, x2: x2, y2: y2};
 
-		  }
+		this.vectDraw(vecteur);
+		this.vecteurs.push(vecteur);
 
-		  vectDraw(vect){
+		return this;
 
-					 if(vect.ligne){vect.ligne.remove()}
-					 vect.ligne = this.annotationsGroup.append("line")
-								.attr("x1", this.echellex(vect.x1)/* + pad*/)
-								.attr("x2", this.echellex(vect.x2) /*- pad*/)
-								.attr("y1", this.echelley(vect.y1))
-								.attr("y2", this.echelley(vect.y2))
-								.attr("class", "vecteur")
-								.attr("style", "marker-end: url(#flechev);");
+	}
 
-					 return this;
-		  }
+	vectDraw(vect){
 
-		  etiquette ( x, y, texte, options){
-					 var etiquette = {
-								x: x,
-								y: y,
-								texte: texte,
-								options: options
-					 };
+		if(vect.ligne){vect.ligne.remove()}
+		vect.ligne = this.annotationsGroup.append("line")
+			.attr("x1", this.echellex(vect.x1)/* + pad*/)
+			.attr("x2", this.echellex(vect.x2) /*- pad*/)
+			.attr("y1", this.echelley(vect.y1))
+			.attr("y2", this.echelley(vect.y2))
+			.attr("class", "vecteur")
+			.attr("style", "marker-end: url(#flechev);");
 
-					 this.etiquettes.push(etiquette);
-					 this.etiqDraw(etiquette);
+		return this;
+	}
 
-					 return this;
+	etiquette ( x, y, texte, options){
+		var etiquette = {
+			x: x,
+			y: y,
+			texte: texte,
+			options: options
+		};
 
-		  }
+		this.etiquettes.push(etiquette);
+		this.etiqDraw(etiquette);
 
-		  etiqDraw (e) {
+		return this;
 
-					 if(e.display){e.display.remove()}
-					 e.display = this.annotationsGroup.append("text")
-								.attr("class", "etiquette")
-								.attr("x", this.echellex(e.x))
-								.attr("y", this.echelley(e.y))
-								.attr("text-anchor", "middle")
-								.text(e.texte);
+	}
 
-					 return this;
-		  }
+	etiqDraw (e) {
 
-			ply(c) {
-				this.plagesy.push(c);
-				this.plageyDraw(this.plagesy[this.plagesy.length -1]);
-			}
+		if(e.display){e.display.remove()}
+		e.display = this.annotationsGroup.append("text")
+			.attr("class", "etiquette")
+			.attr("x", this.echellex(e.x))
+			.attr("y", this.echelley(e.y))
+			.attr("text-anchor", "middle")
+			.text(e.texte);
 
-		  plageyDraw(p) {
+		return this;
+	}
 
-					 if(p.ligne){p.ligne.remove()}
-					 if(p.texteDisplay){p.texteDisplay.remove()}
+	ply(c) {
+		this.plagesy.push(c);
+		this.plageyDraw(this.plagesy[this.plagesy.length -1]);
+	}
 
-					 p.ligne = this.plageGroup.append("line")
-								.attr("y1", this.echelley(p.min) - this.padPlage)
-								.attr("y2", this.echelley(p.max) + this.padPlage)
-								.attr("x1", this.echellex(p.x))
-								.attr("x2", this.echellex(p.x))
-								.attr("class", "help")
-								.attr("style", "marker-start: url(#flecheg);marker-end: url(#flechev);");
+	plageyDraw(p) {
 
-					 p.texteDisplay = this.svg.append("text")
-								.attr("class", "help")
-								.attr("y", this.echelley(p.min + (p.max - p.min)/2))
-								.attr("x", this.echellex(p.x + p.labelShift))
-								.attr("text-anchor", "middle")
-								.text(p.id)
-					 ;
-		  }
+		if(p.ligne){p.ligne.remove()}
+		if(p.texteDisplay){p.texteDisplay.remove()}
 
-		  plagexDraw(p) {
+		p.ligne = this.plageGroup.append("line")
+			.attr("y1", this.echelley(p.min) - this.padPlage)
+			.attr("y2", this.echelley(p.max) + this.padPlage)
+			.attr("x1", this.echellex(p.x))
+			.attr("x2", this.echellex(p.x))
+			.attr("class", "help")
+			.attr("style", "marker-start: url(#flecheg);marker-end: url(#flechev);");
 
-					 if(p.ligne){p.ligne.remove()}
-					 if(p.texteDisplay){p.texteDisplay.remove()}
+		p.texteDisplay = this.svg.append("text")
+			.attr("class", "help")
+			.attr("y", this.echelley(p.min + (p.max - p.min)/2))
+			.attr("x", this.echellex(p.x + p.labelShift))
+			.attr("text-anchor", "middle")
+			.text(p.id)
+		;
+	}
 
-					 p.ligne = this.plageGroup.append("line")
-								.attr("x1", this.echellex(p.min) + this.padPlage)
-								.attr("x2", this.echellex(p.max) - this.padPlage)
-								.attr("y1", this.echelley(p.y))
-								.attr("y2", this.echelley(p.y))
-								//.attr("y1", this.height - this.margeB*.5)
-								//.attr("y2", this.height - this.margeB*.5)
-								.attr("class", "help")
-								.attr("style", "marker-start: url(#flecheg);marker-end: url(#flechev);");
+	plagexDraw(p) {
 
-					 p.texteDisplay = this.svg.append("text")
-								.attr("class", "help")
-								.attr("x", this.echellex(p.min + (p.max - p.min)/2))
-								//.attr("y", this.height - this.margeB * .3)
-								.attr("y", this.echelley(p.y) - 15)
-								.attr("text-anchor", "middle")
-								.text(p.id)
-					 ;
-		  }
+		if(p.ligne){p.ligne.remove()}
+		if(p.shade){p.shade.remove()}
+		if(p.texteDisplay){p.texteDisplay.remove()}
 
-		  plagex (min, max, id, y){
-					 var plage = {
-								min: min,
-								max: max,
-								id: id,
-								y: y
-					 };
+		p.ligne = this.plageGroup.append("line")
+			.attr("x1", this.echellex(p.min) + this.padPlage)
+			.attr("x2", this.echellex(p.max) - this.padPlage)
+			.attr("y1", this.echelley(p.y))
+			.attr("y2", this.echelley(p.y))
+			.attr("class", "help")
+			.attr("style", "marker-start: url(#flecheg);marker-end: url(#flechev);");
 
-					 this.plagexDraw(plage);
+		p.texteDisplay = this.svg.append("text")
+			.attr("class", "help")
+			.attr("x", this.echellex(p.min + (p.max - p.min)/2))
+			.attr("y", this.echelley(p.y) - 15)
+			.attr("text-anchor", "middle")
+			.text(p.id)
+		;
 
-					 this.plagesx.push(plage);
+		p.shade = this.plageGroup.append('rect')
+			.attr('x', this.echellex(p.min))
+			.attr('y', this.margeH)
+			.attr('height', this.height - this.margeH - this.margeB)
+			.attr('width', this.echellex(p.max) - this.echellex(p.min));
+	}
 
-					 return this;
+	plagex (min, max, id, y){
+		var plage = {
+			min: min,
+			max: max,
+			id: id,
+			y: y
+		};
 
-		  }
+		this.plagexDraw(plage);
 
-		  setidx (texte){
-					 if (texte){this.idxText = texte}
-					 if(this.idx){this.idx.remove()}
-					 var y = this.height - (.2 * this.margeB);
+		this.plagesx.push(plage);
 
-					 if(this.idPos == "center"){
-								var x = this.margeG + ((this.width - this.margeD)-this.margeG)/2;
-								var anchor = "middle";
-					 }
+		return this;
 
-					 else if(this.idPos == "end"){
-								var x = this.width - this.margeD;
-								var anchor = "end";
-					 }
+	}
 
-					 this.idx = this.svg.append("text")
-								.attr("x", x)
-								.attr("y", y)
-								.attr("text-anchor", anchor)
-					 			.classed('idx', true)
-								.text(this.idxText);
+	setidx (texte){
+		if (texte){this.idxText = texte}
+		if(this.idx){this.idx.remove()}
+		var y = this.height - (.2 * this.margeB);
 
-					 return this;
-		  }
+		if(this.idPos == "center"){
+			var x = this.margeG + ((this.width - this.margeD)-this.margeG)/2;
+			var anchor = "middle";
+		}
 
-		  /*
-		  texte(x,y,texte){
+		else if(this.idPos == "end"){
+			var x = this.width - this.margeD;
+			var anchor = "end";
+		}
+
+		this.idx = this.svg.append("text")
+			.attr("x", x)
+			.attr("y", y)
+			.attr("text-anchor", anchor)
+			.classed('idx', true)
+			.text(this.idxText);
+
+		return this;
+	}
+
+	/*
+			texte(x,y,texte){
 					 var t = this.svg.append('text')
 								.attr("text-anchor", 'middle')
 								.attr('x', this.echellex(x))
 								.attr('y', this.echelley(y))
 								.text(texte);
-		  }
-		  */
+			}
+			*/
 
-		  setidy (texte){
+	setidy (texte){
 
-					 if(this.idy){this.idy.remove()}
-					 if(texte){this.idyText = texte}
-					 if(this.idPos == "center"){
-								var x = this.margeG/3;
-								var y = this.margeH + ((this.height - (this.margeB + this.margeH))/2);
-								var anchor = "middle";
-								var transform = "rotate(-90 " + x + " " + y + ")";
-					 }
+		if(this.idy){this.idy.remove()}
+		if(texte){this.idyText = texte}
+		if(this.idPos == "center"){
+			var x = this.margeG/3;
+			var y = this.margeH + ((this.height - (this.margeB + this.margeH))/2);
+			var anchor = "middle";
+			var transform = "rotate(-90 " + x + " " + y + ")";
+		}
 
-					 else if(this.idPos == "end"){
-								var x = this.margeG + 15;
-								var y = this.margeH + 10;
-								var anchor = "start";
-					 }
+		else if(this.idPos == "end"){
+			var x = this.margeG + 15;
+			var y = this.margeH + 10;
+			var anchor = "start";
+		}
 
-					 this.idy = this.svg.append("text")
-								.attr("y", y)
-								.attr("x", x)
-								.attr("text-anchor", anchor)
-								.attr("transform", transform)
-								.text(this.idyText);
+		this.idy = this.svg.append("text")
+			.attr("y", y)
+			.attr("x", x)
+			.attr("text-anchor", anchor)
+			.attr("transform", transform)
+			.text(this.idyText);
 
-					 return this;
-		  }
+		return this;
+	}
 
-		  pointyDraw (p) {
-					 if(p.ligne){p.ligne.remove()};
-					 p.ligne = this.svg.append("line")
-								.attr("x1", this.margeG)
-								.attr("x2", this.width - this.margeD)
-								.attr("y1", this.echelley(p.val))
-								.attr("y2", this.echelley(p.val))
-								.attr("class", "pointy");
+	pointyDraw (p) {
+		if(p.ligne){p.ligne.remove()};
+		p.ligne = this.svg.append("line")
+			.attr("x1", this.margeG)
+			.attr("x2", this.width - this.margeD)
+			.attr("y1", this.echelley(p.val))
+			.attr("y2", this.echelley(p.val))
+			.attr("class", "pointy");
 
-					 /*
+		/*
 					 var texte = this.svg.append("text")
 								.attr("text-anchor", "middle")
 								.attr("y", this.echelley(val))
@@ -619,114 +628,114 @@ export class graph {
 								texte.attr("x", this.margeG/2);
 					 }
 					 */
-		  }
+	}
 
-		  pointy (val, id) {
+	pointy (val, id) {
 
-					 var point = {
-								val: val,
-								id: id
-					 };
+		var point = {
+			val: val,
+			id: id
+		};
 
-					 this.pointyDraw(point);
-					 this.pointsy.push(point);
+		this.pointyDraw(point);
+		this.pointsy.push(point);
 
-					 return this;
-		  }
+		return this;
+	}
 
-		  pointx (val, id){
-					 var an = this.svg.append("line")
-								.attr("x1", this.echellex(val))
-								.attr("x2", this.echellex(val))
-								.attr("y1", this.echelley(this.ymin))
-								.attr("y2", this.echelley(this.ymax))
-								.attr("class", "pointx");
-					 this.pointsx.push(an);
+	pointx (val, id){
+		var an = this.svg.append("line")
+			.attr("x1", this.echellex(val))
+			.attr("x2", this.echellex(val))
+			.attr("y1", this.echelley(this.ymin))
+			.attr("y2", this.echelley(this.ymax))
+			.attr("class", "pointx");
+		this.pointsx.push(an);
 
-					 var an = this.svg.append("text")
-								.attr("y", this.height - this.margeB/3)
-								.attr("x", this.echellex(val))
-								.attr("text-anchor", "middle")
-								.text(id);
-					 this.anotations.push(an);
-					 return this;
-		  }
+		var an = this.svg.append("text")
+			.attr("y", this.height - this.margeB/3)
+			.attr("x", this.echellex(val))
+			.attr("text-anchor", "middle")
+			.text(id);
+		this.anotations.push(an);
+		return this;
+	}
 
-		  drawGridY (){
+	drawGridY (){
 
-					 if(this.gridYGroup){this.gridYGroup.remove()}
-					 this.gridY = d3.svg.axis()
-								.orient("left")
-								.tickSize(- (this.width - this.margeG - this.margeD))
-					 			.ticks(this.nticksY)
-								.scale(this.echelley);
+		if(this.gridYGroup){this.gridYGroup.remove()}
+		this.gridY = d3.svg.axis()
+			.orient("left")
+			.tickSize(- (this.width - this.margeG - this.margeD))
+			.ticks(this.nticksY)
+			.scale(this.echelley);
 
-					 this.gridYGroup = this.gridGroup.append("g")
-								.attr("class", "gridY")
-								.attr("transform", "translate(" + this.echellex(this.xmin) + ", 0)")
-								.call(this.gridY)
-					 ;
+		this.gridYGroup = this.gridGroup.append("g")
+			.attr("class", "gridY")
+			.attr("transform", "translate(" + this.echellex(this.xmin) + ", 0)")
+			.call(this.gridY)
+		;
 
-					 return this;
-		  }
+		return this;
+	}
 
-		  drawGridX (){
+	drawGridX (){
 
-					 if(this.gridXGroup){this.gridXGroup.remove()}
-					 this.gridX = d3.svg.axis()
-								.tickSize(- (this.height - this.margeH - this.margeB - this.padH))
-					 			.ticks(this.nticksX)
-								.scale(this.echellex);
+		if(this.gridXGroup){this.gridXGroup.remove()}
+		this.gridX = d3.svg.axis()
+			.tickSize(- (this.height - this.margeH - this.margeB - this.padH))
+			.ticks(this.nticksX)
+			.scale(this.echellex);
 
-					 this.gridXGroup = this.gridGroup.append("g")
-								.attr("class", "gridX")
-								.attr("transform", "translate(0, " + this.echelley(this.ymin) + ")")
-								.call(this.gridX)
-					 ;
+		this.gridXGroup = this.gridGroup.append("g")
+			.attr("class", "gridX")
+			.attr("transform", "translate(0, " + this.echelley(this.ymin) + ")")
+			.call(this.gridX)
+		;
 
-					 return this;
-		  }
+		return this;
+	}
 
-		  drawGradY (){
+	drawGradY (){
 
-					 this.gradY = d3.svg.axis()
-								.tickSize(20)
-					 //.orient("left")
-								.scale(this.echelley);
+		this.gradY = d3.svg.axis()
+			.tickSize(20)
+		//.orient("left")
+			.scale(this.echelley);
 
-					 this.gradYGroup = this.svg.append("g")
-								.attr("class", "gradY")
-								.attr("transform", "translate(" + this.echellex(this.xmin) + ", 0)")
-								.call(this.gradY)
-					 ;
+		this.gradYGroup = this.svg.append("g")
+			.attr("class", "gradY")
+			.attr("transform", "translate(" + this.echellex(this.xmin) + ", 0)")
+			.call(this.gradY)
+		;
 
-					 return this;
-		  }
+		return this;
+	}
 
-		  drawGradX (){
+	drawGradX (){
 
-					 this.gradX = d3.svg.axis()
-								.scale(this.echellex);
+		this.gradX = d3.svg.axis()
+			.scale(this.echellex);
 
-					 this.gradXGroup = this.svg.append("g")
-								.attr("class", "gradX")
-								.attr("transform", "translate(0, " + this.echelley(this.ymin) + ")")
-								.call(this.gradX)
-					 ;
+		this.gradXGroup = this.svg.append("g")
+			.attr("class", "gradX")
+			.attr("transform", "translate(0, " + this.echelley(this.ymin) + ")")
+			.call(this.gradX)
+		;
 
-					 return this;
-		  }
+		return this;
+	}
 
-		  playSimb (){
-					 this.svg.append("polygon")
-								.attr("class", "playSimb")
-								.attr("points", "0,0 0,50 43.3,25 0,0");
-					 return this;
-		  }
+	playSimb (){
+		this.svg.append("polygon")
+			.attr("class", "playSimb")
+			.attr("points", "0,0 0,50 43.3,25 0,0");
+		return this;
+	}
 
-		  controlSymbol(){
-					 return this;
-		  }
+	controlSymbol(){
+		return this;
+	}
 
-		  //	return this;
+	//	return this;
 }
