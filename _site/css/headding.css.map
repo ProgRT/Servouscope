@@ -1,0 +1,12 @@
+{
+	"version": 3,
+	"file": "headding.css",
+	"sources": [
+		"headding.sass"
+	],
+	"sourcesContent": [
+		"h1 {\n  margin: 0px;\n  font-weight: normal;\n\n  img {\n    vertical-align: text-bottom;\n    height: 1em; } }\n\np.subtitle {\n  display: none; }\n"
+	],
+	"names": [],
+	"mappings": "AAAA,AAAA,EAAE,CAAC,EACD,MAAM,EAAE,GAAG,EACX,WAAW,EAAE,MAAM,GAID;;AANpB,AAIE,EAJA,CAIA,GAAG,CAAC,EACF,cAAc,EAAE,WAAW,EAC3B,MAAM,EAAE,GAAG,GAAG;;AAElB,AAAA,CAAC,AAAA,SAAS,CAAC,EACT,OAAO,EAAE,IAAI,GAAG"
+}

@@ -1,55 +1,49 @@
-const knownParams = [
-	"Niv. AI sur PEP",
-	"PEP",
-	"Trigger en débit",
-	"Fin d'insuff.",
-	"Pentetps insp. (s)",
-	"Ti",
-	"Volume courant",
-	"F resp.",
-	"Trigger en pression",
-	"Conc. O2",
-	"Niveau NAVA",
-	"Trigger Edi",
-];
-
-const numParams = [
-	'PRESSION',
-	'DÉBIT',
-	'VOLUME',
-	'Edi'
-]
-
-const toDiscard = [
-	"[REC]",
-	"==========",
-	""
-];
-
 export class dataset {
 	constructor(string) {
+		if(string.substring(0,5) == '[REC]'){this.parseSu(string)}
+		else if(string.substring(0,18) == 'ASL 3.4 .rwa ASCII'){
+			console.log('Looks like ASL data')
+			this.parseASL(string);
+		}
+		else {console.log('Unkonwn data format')}
+	}
+
+	parseSu(string){
 		let [pstr, dstr] = string.split('[DATA]');
-		[this.params, this.unparsedLines] = parseParams(pstr);	
-		[this.data, this.monitoredParams] = parseData(dstr);
+
+		[this.params, this.unparsedLines] = parseSuParams(pstr);	
+		[this.data, this.monitoredParams] = parseSuData(dstr);
+
+		this.mode =  this.unparsedLines.find(d=>d[0] == 'Mode de ventilation')[1];
+		const datestr =  this.unparsedLines.find(d=>d[0] == "Date de l'enregistrement")[1];
+		this.date =  parseDate(datestr);
+
+
 		this.data = this.data.map(d=>{
 			let t = d.Durée.split(':');
-			let ndate = new Date(this.date.getFullYear(), this.date.getMonth(), this.date.getDate(), t[0], t[1], t[2], t[3]);
-			d.Durée = ndate;
+			d.Durée = new Date(
+				this.date.getFullYear(), 
+				this.date.getMonth(), 
+				this.date.getDate(), 
+				...d.Durée.split(':')
+			);
 			return d;
 		});
 	}
-
-	get mode() {
-		return this.unparsedLines.find(d=>d[0] == 'Mode de ventilation')[1];
+	
+	parseASL(string){
+		[this.data, this.monitoredParams] = parseASLData(string);
 	}
 
-	get date() {
-		let dstr =  this.unparsedLines.find(d=>d[0] == "Date de l'enregistrement")[1];
-		return parseDate(dstr);
-	}
 }
 
-function parseParams(string) {
+function parseSuParams(string) {
+	const toDiscard = [
+		"[REC]",
+		"==========",
+		""
+	];
+
 	var params = [];
 	var unparsed = [];
 
@@ -63,34 +57,48 @@ function parseParams(string) {
 	return [params, unparsed];
 }
 
-function parseData(string) {
-	var lines = string.split("\n");
-	lines = lines.filter(l => l != "")
-	let monitoredParams = lines.shift().split('\t');
-	let labels = monitoredParams.map(s=>s.split(' ')[0]);
-	let data = lines.map(d=>d.split('\t'));
-	data = data.map(d=>{
-		return d.map(d=>d.replace(',', '.'));
+function parseSuData(string) {
+	const numParams = [
+		'PRESSION',
+		'DÉBIT',
+		'VOLUME',
+		'Edi'
+	]
+
+	var lines = string.split("\n").filter(l => l != "");
+	let monitoredParams = lines.shift().split('\t').map(s=>{
+		return {
+			id: s.match(/^[A-z0-9À-ú]+/),
+			description: null,
+			unit: null,
+			label: null,
+		}
 	});
+	const replaceComa = d=>d.replace(',', '.');
+
+	let data = lines.map(line=>line.split('\t').map(replaceComa));
 
 	// Convert array to object
-	data = data.map(d=>{
+	data = data.map(line=>{
 		let obj = {};
 
-		for(let i in d){
-			if(numParams.includes(labels[i])){
-				obj[labels[i]] = parseFloat(d[i]);
+		for(let fieldNum in line){
+
+			if(numParams.includes(monitoredParams[fieldNum].id)){
+				obj[monitoredParams[fieldNum].id] = parseFloat(line[fieldNum]);
 			}
 			else{
-				obj[labels[i]] = d[i];
+				obj[monitoredParams[fieldNum].id] = line[fieldNum];
 			}
 		}
 		
 		return obj;
 	});
 
+	console.log(data[0]);
 	return [data, monitoredParams];
 }
+
 
 function parseDate(str){
 	var d, h;

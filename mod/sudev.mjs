@@ -88,10 +88,15 @@ function dataSetBlock(dataset){
 
 	var block = document.createElement("button");
 	block.className = "dataSetBlock";
+	block.innerHTML = '';
 
-	var datestring = dataset.date.toISOString().split(".")[0].replace("T", " ");
+	if(dataset.date){
+		block.innerHTML += dataset.date.toISOString().split(".")[0].replace("T", " ") + '<br/>';
+	}
 
-	block.innerHTML = datestring + '<br/>' + dataset.mode;
+	if(dataset.mode){
+		block.innerHTML += dataset.mode;
+	}
 
 	return block;
 }

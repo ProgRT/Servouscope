@@ -37,53 +37,57 @@ export class display {
 
 	display(dataset){
 		this.dataset = dataset;
+		this.fx = d => (d.Durée.getTime() - dataset.date.getTime())/1000;
 
-		let availableParams = dataset.monitoredParams.map(d=>d.split(' ')[0]);
+		//let availableParams = dataset.monitoredParams.map(d=>d.split(' ')[0]);
+		let availableParams = dataset.monitoredParams.map(d=>d.id);
+		console.log(availableParams);
 		
 		this.graphs = [];
 		this.graphDiv.innerHTML = null;
 
+		//for(let p of this.params.filter(p=>availableParams.includes(p))){
 		for(let p of this.params.filter(p=>availableParams.includes(p))){
 			this.makeGraph(dataset, p);
 		}
 
-		if(this.zoomable){
-
-			let data = dataset.data;
-			let fx = d => (d.Durée.getTime() - dataset.date.getTime())/1000;
-			let fy = d => d.DÉBIT;
-
-			d3.select(this.graphDiv)
-				.append('svg')
-				.attr('id', 'grPager');
-
-			this.pager = new graph('#grPager')
-				.setscale(data, fx, fy)
-				.tracer(data, fx, fy)
-				.setidx("Temps (s)")
-				.setidy('Débit');
-
-			this.pager.plagex(
-				this.pager.echellex(0),
-				this.pager.echellex(data.length - 1),
-				'',
-				0
-			);
-
-			let rParam = {
-				target: this.graphDiv,
-				min: 0 ,
-				max: data.length - 1,
-				marginLeft : this.graphs[0].margeG + 'px',
-				marginRight : this.graphs[0].margeD + 'px',
-				inputHandler: this.updateZoom,
-			}
-
-			this.range = new drange(rParam);
-		}
+		if(this.zoomable){this.createPager()}
 
 		this.makeTable(dataset);
 		this.redraw();
+	}
+
+	createPager(){
+		let data = this.dataset.data;
+		let fy = d => d.DÉBIT;
+
+		d3.select(this.graphDiv)
+			.append('svg')
+			.attr('id', 'grPager');
+
+		this.pager = new graph('#grPager')
+			.setscale(data, this.fx, fy)
+			.tracer(data, this.fx, fy)
+			.setidx("Temps (s)")
+			.setidy('Débit');
+
+		this.pager.plagex(
+			this.pager.echellex(0),
+			this.pager.echellex(data.length - 1),
+			'',
+			0
+		);
+
+		let rParam = {
+			target: this.graphDiv,
+			min: 0 ,
+			max: data.length - 1,
+			marginLeft : this.graphs[0].margeG + 'px',
+			marginRight : this.graphs[0].margeD + 'px',
+			inputHandler: this.updateZoom,
+		}
+
+		this.range = new drange(rParam);
 	}
 
 	makeGraph(dataset, param){
@@ -93,13 +97,12 @@ export class display {
 			.append('svg')
 			.attr('id', 'gr'+param);
 
-		let fx = d => (d.Durée.getTime() - dataset.date.getTime())/1000;
 		let fy = d => d[param];
 
 		this.graphs.push(
 			new graph('#gr' + param)
-			.setscale(data, fx, fy)
-			.tracer(data, fx, fy)
+			.setscale(data, this.fx, fy)
+			.tracer(data, this.fx, fy)
 			.setidx("Temps (s)")
 			.setidy(param[0] + param.slice(1).toLowerCase())
 		);
@@ -107,20 +110,33 @@ export class display {
 
 	updateZoom = ()=>{
 		let data = this.dataset.data;
-		let fx = d => (d.Durée.getTime() - this.dataset.date.getTime())/1000;
 		let dataStart = data[0].Durée.getTime();
 
 		let tStart = this.range.start;
 		let tEnd = this.range.end;
 
 		let plage = this.pager.plagesx[0];
-		plage.min = fx(data[tStart]);
-		plage.max = fx(data[tEnd]);
+		plage.min = this.fx(data[tStart]);
+		plage.max = this.fx(data[tEnd]);
 		this.pager.plagexDraw(plage);
 
 		this.subset = data.filter((d, i)=>{
 			return i > tStart && i < tEnd;	
 		});
+
+		// Reducing functions
+		var rData = [];
+		for(let r of this.reducers||[]){
+			var result = this.subset.reduce(r.f, 0);
+			if(r.round){result = Math.round(result)}
+			rData.push([r.name, result, r.unit]);
+		}
+		var rTable = document.querySelector('#rTable');
+		if(rTable){rTable.remove()};
+		rTable = table(rData);
+		rTable.id = 'rTable';
+		this.infoDiv.appendChild(rTable);
+
 
 		for(var gr of this.graphs){
 			gr.donnees[0].donnees = this.subset;
@@ -136,20 +152,28 @@ export class display {
 
 	makeTable(dataset){
 		this.infoDiv.innerHTML = null;
+
 		// Main table
-		var caption = document.createElement("caption");
-		caption.textContent = "Paramètres";
 
-		var t = table(dataset.params);
+	//	if(dataset.params.length > 0){
+		if(dataset.params){
+			var caption = document.createElement("caption");
+			caption.textContent = "Paramètres";
 
-		t.prepend(caption);
-		this.infoDiv.appendChild(t);
+			var t = table(dataset.params);
+
+			t.prepend(caption);
+			this.infoDiv.appendChild(t);
+		}
+		//
 		//Second table
 
-		var details = document.createElement('details');
-		var t2 = table(dataset.unparsedLines);
-		details.appendChild(t2);
-		this.infoDiv.appendChild(details);
+		if(dataset.unparsedLines){
+			var details = document.createElement('details');
+			var t2 = table(dataset.unparsedLines);
+			details.appendChild(t2);
+			this.infoDiv.appendChild(details);
+		}
 
 	}
 

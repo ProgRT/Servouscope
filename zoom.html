@@ -29,12 +29,21 @@
 <script src="./lib/d3.v3.min.js"></script>
 <script type="module">
 	import {sudev} from './mod/sudev.mjs';
+
+	const deltaVolume = (a, d, i , t)=>{
+		return a + (d.DÉBIT/6);
+	}
+
 	let param = {
 		dParams: {
 			zoomable: true,
 			params: [
 				'PRESSION',
 				'DÉBIT'
+			],
+			reducers: [
+				{ name: 'Delta volume', unit: 'ml', f: deltaVolume, round:
+				true}
 			]
 		}
 	};
