@@ -45,12 +45,11 @@ export class display {
 
 		//let availableParams = dataset.monitoredParams.map(d=>d.split(' ')[0]);
 		var availableParams = dataset.monitored.map(d=>d.id);
-		this.plotable = this.params.filter(p=>availableParams.includes(p));
+		this.plotable = dataset.monitored.filter(d=>this.params.includes(d.id));
 		
 		this.graphs = [];
 		this.graphDiv.innerHTML = null;
 
-		//for(let p of this.params.filter(p=>availableParams.includes(p))){
 		for(let p of this.plotable){
 			this.makeGraph(dataset, p);
 		}
@@ -58,12 +57,11 @@ export class display {
 		if(this.zoomable){this.createPager()}
 
 		this.makeTable(dataset);
-		//this.redraw();
 	}
 
 	createPager(){
 		let data = this.dataset.data;
-		let fy = d => d[this.plotable[0]];
+		let fy = d => d[this.plotable[0].id];
 
 		d3.select(this.graphDiv)
 			.append('svg')
@@ -73,7 +71,7 @@ export class display {
 			.setscale(data, this.fx, fy)
 			.tracer(data, this.fx, fy)
 			.setidx("Temps (s)")
-			.setidy('Débit');
+			.setidy(this.plotable[0].label);
 
 		this.pager.plagex(
 			this.pager.echellex(0),
@@ -99,16 +97,16 @@ export class display {
 
 		d3.select(this.graphDiv)
 			.append('svg')
-			.attr('id', 'gr'+param);
+			.attr('id', 'gr'+param.id);
 
-		let fy = d => d[param];
+		let fy = d => d[param.id];
 
 		this.graphs.push(
-			new graph('#gr' + param)
+			new graph('#gr' + param.id)
 			.setscale(data, this.fx, fy)
 			.tracer(data, this.fx, fy)
 			.setidx("Temps (s)")
-			.setidy(param[0] + param.slice(1).toLowerCase())
+			.setidy(param.label)
 		);
 	}
 
@@ -161,7 +159,6 @@ export class display {
 
 		// Main table
 
-	//	if(dataset.params.length > 0){
 		if(dataset.params){
 			var caption = document.createElement("caption");
 			caption.textContent = "Paramètres";
@@ -171,7 +168,7 @@ export class display {
 			t.prepend(caption);
 			this.infoDiv.appendChild(t);
 		}
-		//
+
 		//Second table
 
 		if(dataset.unparsed){
