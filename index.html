@@ -19,6 +19,19 @@
 
 <script src="./lib/d3.v3.min.js"></script>
 <script type="module">
-	import {sudev} from './mod/sudev.mjs';
-	var disp = new sudev('body', {multiple: true});
+	import {sudev} from './mod/sudev2.0.mjs';
+	const deltaVolume = (a, d, i , t)=>{
+		return a + (d.DÉBIT/6);
+	};
+	var disp = new sudev('body', {
+		multiple: true, 
+		dParams: {
+			zoomable: true,
+			reducers: [
+				{ name: 'Delta volume', unit: 'ml', f: deltaVolume, round:
+				true}
+			]
+		}
+	}
+	);
 </script>

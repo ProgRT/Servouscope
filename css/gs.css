@@ -42,4 +42,7 @@ g#annotationsGroup line, g#plageGroup line {
   stroke-width: 1px;
   stroke: #333333; }
 
+	#plageGroup rect {
+		opacity: 0.25;
+	}
 /*# sourceMappingURL=gs.css.map */

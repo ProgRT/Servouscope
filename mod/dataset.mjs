@@ -1,3 +1,6 @@
+function isServou(str){return string.substring(0,5) == '[REC]';}
+function isASL(str){string.substring(0,18) == 'ASL 3.4 .rwa ASCII'}
+
 export class dataset {
 	constructor(string) {
 		if(string.substring(0,5) == '[REC]'){this.parseSu(string)}

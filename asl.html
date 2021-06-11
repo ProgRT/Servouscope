@@ -19,28 +19,19 @@
 
 <script src="./lib/d3.v3.min.js"></script>
 <script type="module">
-	import {parseASL} from './mod/asl.mjs';
-	import {parseSu, parseSuTime} from './mod/servou.mjs';
+	import {parseDataset} from './mod/dataset2.0.mjs';
 	import {display} from './mod/display2.0.mjs';
 
 	let params = {
-	params: [
-		'AirwayPressure',
-		'TotalVolume'
-		],
-	zoomable: true
+		zoomable: true
 	}
 	var disp = new display('body', params);
 	
-	fetch('data/vdr4_base.rwa')
-		.then(response =>response.text())
-		.then(text =>{
-			let dataset = parseASL(text);
-			console.log(dataset);
-			disp.display(parseASL(text))
-		});
-
-//	fetch('data/1546250546580.txt')
-//		.then(response =>response.text())
-//		.then(text =>disp.display(parseSu(text)));
+//fetch('data/1546250546580.txt')
+fetch('data/vdr4_base.rwa')
+	.then(response =>response.text())
+	.then(text =>{
+		let dataset = parseDataset(text);
+		disp.display(dataset)
+	});
 </script>

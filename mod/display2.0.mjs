@@ -3,6 +3,8 @@ import {drange} from './drange.mjs'
 
 let defaults = {
 	params: [
+		'AirwayPressure',
+		'TotalVolume',
 		'PRESSION',
 		'DÉBIT',
 		'VOLUME',
@@ -36,30 +38,32 @@ export class display {
 	}
 
 	display(dataset){
+		//console.table(dataset.monitored);
 		this.dataset = dataset;
-//		this.fx = d => (d.Durée.getTime() - dataset.date.getTime())/1000;
+		//this.fx = d => (d.Durée.getTime() - dataset.date.getTime())/1000;
 		this.fx = d=>d.Time;
 
 		//let availableParams = dataset.monitoredParams.map(d=>d.split(' ')[0]);
-		let availableParams = dataset.monitored.map(d=>d.id);
+		var availableParams = dataset.monitored.map(d=>d.id);
+		this.plotable = this.params.filter(p=>availableParams.includes(p));
 		
 		this.graphs = [];
 		this.graphDiv.innerHTML = null;
 
 		//for(let p of this.params.filter(p=>availableParams.includes(p))){
-		for(let p of this.params.filter(p=>availableParams.includes(p))){
+		for(let p of this.plotable){
 			this.makeGraph(dataset, p);
 		}
 
 		if(this.zoomable){this.createPager()}
 
-		//this.makeTable(dataset);
+		this.makeTable(dataset);
 		//this.redraw();
 	}
 
 	createPager(){
 		let data = this.dataset.data;
-		let fy = d => d.AirwayPressure;
+		let fy = d => d[this.plotable[0]];
 
 		d3.select(this.graphDiv)
 			.append('svg')
@@ -129,7 +133,9 @@ export class display {
 		for(let r of this.reducers||[]){
 			var result = this.subset.reduce(r.f, 0);
 			if(r.round){result = Math.round(result)}
-			rData.push([r.name, result, r.unit]);
+			if(result){
+				rData.push([r.name, result, r.unit]);
+			}
 		}
 		var rTable = document.querySelector('#rTable');
 		if(rTable){rTable.remove()};
@@ -168,9 +174,9 @@ export class display {
 		//
 		//Second table
 
-		if(dataset.unparsedLines){
+		if(dataset.unparsed){
 			var details = document.createElement('details');
-			var t2 = table(dataset.unparsedLines);
+			var t2 = table(dataset.unparsed);
 			details.appendChild(t2);
 			this.infoDiv.appendChild(details);
 		}

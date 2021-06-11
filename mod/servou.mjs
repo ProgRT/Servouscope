@@ -5,7 +5,6 @@ export function parseSu(string){
 	[params, unparsed] = parseSuParams(paramString);
 	[data, monitored] = parseSuData(dataString);
 
-	//this.mode =  this.unparsedLines.find(d=>d[0] == 'Mode de ventilation')[1];
 	//const datestr =  this.unparsedLines.find(d=>d[0] == "Date de l'enregistrement")[1];
 	//this.date =  parseDate(datestr);
 
@@ -24,7 +23,9 @@ export function parseSu(string){
 		data: data,
 		monitored: monitored,
 		params: params,
-		unparsed: unparsed
+		unparsed: unparsed,
+		appareil: 'Servo U',
+		mode: unparsed.find(d=>d[0] == 'Mode de ventilation')[1]
 	}
 }
 
