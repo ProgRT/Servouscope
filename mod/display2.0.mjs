@@ -7,7 +7,7 @@ let defaults = {
 		'TotalVolume',
 		'PRESSION',
 		'DÉBIT',
-		'VOLUME',
+		//'VOLUME',
 		'Edi'
 	],
 };

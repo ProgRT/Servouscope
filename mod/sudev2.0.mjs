@@ -57,7 +57,7 @@ export class sudev {
 			let reader = new FileReader();
 			reader.onload = e=>{
 				var ds = parseDataset(e.target.result);
-				ds.date = new Date(file.lastModified);
+				if(!ds.date){ds.date = new Date(file.lastModified);}
 				this.datasets.push(ds);
 				this.display.display(ds);
 

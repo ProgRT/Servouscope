@@ -1,31 +1,28 @@
 export function parseSu(string){
 	var params, data, unparsed, monitored;
+	var daystr, timestr;
+	var Y, M, D, h, m, s;
+
 	let [paramString, dataString] = string.split('[DATA]');
 
 	[params, unparsed] = parseSuParams(paramString);
 	[data, monitored] = parseSuData(dataString);
 
-	//const datestr =  this.unparsedLines.find(d=>d[0] == "Date de l'enregistrement")[1];
-	//this.date =  parseDate(datestr);
+	const datestr =  unparsed.find(d=>d[0] == "Date de l'enregistrement")[1];
+	[daystr, timestr] = datestr.split(' ');
+	[D, M, Y] = daystr.split('/');
+	[h, m, s] = timestr.split(':');
+	console.log(daystr, timestr);
 
 
-	//this.data = this.data.map(d=>{
-	//	let t = d.Durée.split(':');
-	//	d.Durée = new Date(
-	//		this.date.getFullYear(),
-	//		this.date.getMonth(),
-	//		this.date.getDate(),
-	//		...d.Durée.split(':')
-	//	);
-	//	return d;
-	//});
 	return {
 		data: data,
 		monitored: monitored,
 		params: params,
 		unparsed: unparsed,
 		appareil: 'Servo U',
-		mode: unparsed.find(d=>d[0] == 'Mode de ventilation')[1]
+		mode: unparsed.find(d=>d[0] == 'Mode de ventilation')[1],
+		date: new Date(20 + Y, M, D, h, m, s)
 	}
 }
 
