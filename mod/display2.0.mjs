@@ -1,4 +1,5 @@
-import {graph} from './graphsimple.mjs'
+//import {graph} from '../graphsimple.js/graphsimple.js'
+import {graph} from 'https://progrt.github.io/graphsimple.js/graphsimple.js'
 import {drange} from './drange.mjs'
 
 let defaults = {
