@@ -1,5 +1,5 @@
-import {display} from './display2.0.mjs';
-import {parseDataset} from './dataset2.0.mjs';
+import {display} from './display.js';
+import {parseDataset} from './dataset.js';
 
 let defaults = {
 	dParams: {

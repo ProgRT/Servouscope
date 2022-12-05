@@ -1,5 +1,5 @@
-import {parseSu} from './servou.mjs';
-import {parseASL} from './asl.mjs';
+import {parseSu} from './servou.js';
+import {parseASL} from './asl.js';
 
 function isServou(str){return str.substring(0,5) == '[REC]';}
 function isASL(str){str.substring(0,18) == 'ASL 3.4 .rwa ASCII'}
