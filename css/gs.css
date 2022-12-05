@@ -4,6 +4,7 @@ line.help {
   stroke: black; }
 
 g#annotationsGroup line, g#plageGroup line {
+	display: none;
   stroke: black;
   stroke-width: 1px;
   stroke-dasharray: 1 0; }

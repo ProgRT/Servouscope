@@ -1,5 +1,5 @@
-//import {graph} from '../graphsimple.js/graphsimple.js'
-import {graph} from 'https://progrt.github.io/graphsimple.js/graphsimple.js'
+import {graph} from '../graphsimple.js/graphsimple.js'
+//import {graph} from 'https://progrt.github.io/graphsimple.js/graphsimple.js'
 import {drange} from './drange.mjs'
 
 let defaults = {
@@ -68,15 +68,16 @@ export class display {
 			.append('svg')
 			.attr('id', 'grPager');
 
-		this.pager = new graph('#grPager')
+		this.pager = new graph('#grPager', {nticksX: 0, nticksY: 0, margeB: 10})
 			.setscale(data, this.fx, fy)
 			.tracer(data, this.fx, fy)
-			.setidx("Temps (s)")
-			.setidy(this.plotable[0].label);
+			//.setidx("Temps (s)")
+			//.setidy(this.plotable[0].label)
+		;
 
 		this.pager.plagex(
-			this.pager.echellex(0),
-			this.pager.echellex(data.length - 1),
+			0,
+			Math.max(...data.map(this.fx)),
 			'',
 			0
 		);
