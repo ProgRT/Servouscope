@@ -1,5 +1,5 @@
-//import {graph} from '../graphsimple.js/graphsimple.js'
-import {graph} from 'https://progrt.github.io/graphsimple.js/graphsimple.js'
+import {graph} from '../graphsimple.js/graphsimple.js'
+//import {graph} from 'https://progrt.github.io/graphsimple.js/graphsimple.js'
 import {drange} from './drange.js'
 
 let defaults = {
@@ -7,6 +7,7 @@ let defaults = {
 		'AirwayPressure',
 		'TotalVolume',
 		'PRESSION',
+        'Pva',
 		'DÉBIT',
 		//'VOLUME',
 		'Edi'
@@ -58,6 +59,9 @@ export class display {
 		if(this.zoomable){this.createPager()}
 
 		this.makeTable(dataset);
+        for (let g of this.graphs) {
+            g.redessiner();
+        }
 	}
 
 	createPager(){

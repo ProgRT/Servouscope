@@ -28,6 +28,7 @@ export class sudev {
 
 		this.filesSelector = document.createElement('input');
 		this.filesSelector.type = 'file';
+        this.filesSelector.accept = '.txt, .rwa';
 		this.filesSelector.id = 'suvedFilesSelect';
 
 		if(this.multiple){
@@ -51,14 +52,20 @@ export class sudev {
 	}
 
 	fileInputHandler = e=>{ 
+		this.datasets = [];
 		this.filesList.innerHTML = null;
-		var nfiles = e.target.files.length;	
+		let nfiles = e.target.files.length;	
+
 		for(var file of e.target.files){
 			let reader = new FileReader();
 			reader.onload = e=>{
 				var ds = parseDataset(e.target.result);
 				if(!ds.date){ds.date = new Date(file.lastModified);}
 				this.datasets.push(ds);
+                //if(this.datasets.length == nfiles){
+                //    let tl = this.makeFilesTimeLine();
+                //    document.body.append(tl);
+                //}
 				this.display.display(ds);
 
 				if(this.multiple && nfiles > 1){
@@ -78,6 +85,30 @@ export class sudev {
 		if(e.target.files.length == 0){this.target.classList.add("landing")}
 		else{this.target.classList.remove("landing")}
 	}
+
+    makeFilesTimeLine () {
+        let container = document.createElement('ul');
+        container.className = 'timeline';
+
+        let groups = Object.groupBy(this.datasets, f=>new Intl.DateTimeFormat().format(f.date))
+        for (let date in groups){
+            let label = document.createElement('li');
+            label.textContent = date;
+            container.append(label);
+            let sublist = document.createElement('ul');
+            for (let file of groups[date]) {
+                let label = document.createElement('li');
+                let hour = new Intl.DateTimeFormat(navigator.language, {hour: 'numeric', minute: 'numeric'}).format(file.date);
+                label.textContent = hour;
+                label.onclick = ()=>{
+                    this.display.display(file);
+                }
+                sublist.append(label);
+            }
+            container.append(sublist);
+        }
+        return container;
+    }
 }
 
 function dataSetBlock(dataset){

@@ -12,8 +12,6 @@ export function parseSu(string){
 	[daystr, timestr] = datestr.split(' ');
 	[D, M, Y] = daystr.split('/');
 	[h, m, s] = timestr.split(':');
-	console.log(daystr, timestr);
-
 
 	return {
 		data: data,
