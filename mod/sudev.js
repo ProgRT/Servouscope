@@ -53,33 +53,23 @@ export class sudev {
 
 	fileInputHandler = e=>{ 
 		this.datasets = [];
-		this.filesList.innerHTML = null;
 		let nfiles = e.target.files.length;	
 
-		for(var file of e.target.files){
+		for(let file of e.target.files){
 			let reader = new FileReader();
 			reader.onload = e=>{
-				var ds = parseDataset(e.target.result);
+				let ds = parseDataset(e.target.result);
+                ds.fichier = file.name;
 				if(!ds.date){ds.date = new Date(file.lastModified);}
 				this.datasets.push(ds);
-                //if(this.datasets.length == nfiles){
-                //    let tl = this.makeFilesTimeLine();
-                //    document.body.append(tl);
-                //}
+
 				this.display.display(ds);
 
-				if(this.multiple && nfiles > 1){
-					var dsb = dataSetBlock(ds);
-					dsb.addEventListener('click', (e)=>{
-						for (var but of this.filesList.querySelectorAll('button')){
-							but.disabled = false;
-						}
-						e.target.disabled = true;
-						this.display.display(ds);
-					});
-					this.filesList.appendChild(dsb);
-				}
+                if(this.multiple && nfiles > 1){
+                    this.makeHorizontalTL();
+                }
 			};
+
 			reader.readAsText(file);
 		}
 		if(e.target.files.length == 0){this.target.classList.add("landing")}
@@ -108,6 +98,58 @@ export class sudev {
             container.append(sublist);
         }
         return container;
+    }
+
+    makeBtnList () {
+		this.filesList.innerHTML = null;
+
+		for(let ds of this.datasets){
+            var dsb = dataSetBlock(ds);
+            dsb.addEventListener('click', (e)=>{
+                for (var but of this.filesList.querySelectorAll('button')){
+                    but.disabled = false;
+                }
+                e.target.disabled = true;
+                this.display.display(ds);
+            });
+            this.filesList.appendChild(dsb);
+		}
+    }
+
+    makeHorizontalTL () {
+		this.filesList.innerHTML = null;
+
+        let groups = Object.groupBy(this.datasets, f=>new Intl.DateTimeFormat().format(f.date))
+        let dates = Object.keys(groups);
+        dates.sort();
+        for (let date of dates){
+            let grpBlock = document.createElement('div');
+            grpBlock.className = 'grpBlock';
+            let grpLabel = document.createElement('div');
+            grpLabel.className = 'grpLabel';
+            grpLabel.textContent = date;
+            grpBlock.append(grpLabel);
+
+            let grpContent = document.createElement('div');
+            grpContent.className = 'grpContent';
+            grpBlock.append(grpContent);
+
+            groups[date].sort((a,b)=>a.date-b.date);
+            for(let ds of groups[date]){
+                let btn = document.createElement('button');
+                let hour = new Intl.DateTimeFormat(navigator.language, {hour: 'numeric', minute: 'numeric'}).format(ds.date);
+                btn.textContent = hour;
+                btn.addEventListener('click', (e)=>{
+                    for (var but of this.filesList.querySelectorAll('button')){
+                        but.disabled = false;
+                    }
+                    e.target.disabled = true;
+                    this.display.display(ds);
+                });
+                grpContent.append(btn);
+            }
+            this.filesList.appendChild(grpBlock);
+        }
     }
 }
 

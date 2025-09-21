@@ -58,7 +58,8 @@ export class display {
 
 		if(this.zoomable){this.createPager()}
 
-		this.makeTable(dataset);
+		//this.makeTable(dataset);
+		this.makeTable2(dataset);
         for (let g of this.graphs) {
             g.redessiner();
         }
@@ -160,6 +161,56 @@ export class display {
 
 	}
 
+	makeTable2(dataset){
+		this.infoDiv.innerHTML = null;
+
+        // Info table
+
+        let dfmt = new Intl.DateTimeFormat('fr-ca', {dateStyle: 'short'});
+        let tfmt = new Intl.DateTimeFormat('fr-ca', {timeStyle: 'medium'});
+        let info = [
+            ['Fichier', dataset.fichier],
+            ['Date', dfmt.format(dataset.date)],
+            ['Heure', tfmt.format(dataset.date)],
+        ];
+        if(dataset.mode) info.push(['Mode', dataset.mode]);
+        var details = document.createElement('details');
+        let summary = document.createElement("summary");
+        details.append(summary);
+        details.open=true;
+        summary.textContent = "Fichier";
+
+        var t2 = table(info);
+        details.appendChild(t2);
+        this.infoDiv.appendChild(details);
+
+		// Main table
+
+		if(dataset.params){
+			let details = document.createElement("details");
+			let summary = document.createElement("summary");
+            details.append(summary);
+			summary.textContent = "Paramètres";
+
+			details.append(table(dataset.params));
+            details.open=true;
+
+			this.infoDiv.appendChild(details);
+		}
+
+		//Second table
+
+		if(dataset.unparsed){
+			var details = document.createElement('details');
+			let summary = document.createElement("summary");
+            details.append(summary);
+			summary.textContent = "Détails";
+			var t2 = table(dataset.unparsed);
+			details.appendChild(t2);
+			this.infoDiv.appendChild(details);
+		}
+
+	}
 	makeTable(dataset){
 		this.infoDiv.innerHTML = null;
 

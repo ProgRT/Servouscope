@@ -19,7 +19,9 @@ export function parseSu(string){
 		params: params,
 		unparsed: unparsed,
 		appareil: 'Servo U',
+		ventilateur: unparsed.find(d=>d[0] == 'Ventilateur')[1],
 		mode: unparsed.find(d=>d[0] == 'Mode de ventilation')[1],
+		fichier: unparsed.find(d=>d[0] == 'Fichier')[1],
 		date: new Date(20 + Y, M, D, h, m, s)
 	}
 }
