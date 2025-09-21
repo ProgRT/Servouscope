@@ -63,11 +63,16 @@ export class sudev {
 				if(!ds.date){ds.date = new Date(file.lastModified);}
 				this.datasets.push(ds);
 
-				this.display.display(ds);
 
                 if(this.multiple && nfiles > 1){
                     this.makeHorizontalTL();
                 }
+
+                let btnid = 'btn' + ds.fichier;
+                let dsbtn = document.getElementById(btnid);
+                dsbtn.disabled = true;
+
+				this.display.display(ds);
 			};
 
 			reader.readAsText(file);
@@ -139,6 +144,7 @@ export class sudev {
                 let btn = document.createElement('button');
                 let hour = new Intl.DateTimeFormat(navigator.language, {hour: 'numeric', minute: 'numeric'}).format(ds.date);
                 btn.textContent = hour;
+                btn.id = 'btn' + ds.fichier;
                 btn.addEventListener('click', (e)=>{
                     for (var but of this.filesList.querySelectorAll('button')){
                         but.disabled = false;
