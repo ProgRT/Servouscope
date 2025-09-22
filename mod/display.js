@@ -34,9 +34,11 @@ export class display {
 		this.graphDiv.id = 'sudevGrdiv';
 		this.target.appendChild(this.graphDiv);
 
+        /*
 		this.infoDiv = document.createElement('div');
 		this.infoDiv.id = 'sudevInfodiv';
 		this.target.appendChild(this.infoDiv);
+        */
 	}
 
 	display(dataset){
@@ -59,7 +61,8 @@ export class display {
 		if(this.zoomable){this.createPager()}
 
 		//this.makeTable(dataset);
-		this.makeTable2(dataset);
+		//this.makeTable2(dataset);
+
         for (let g of this.graphs) {
             g.redessiner();
         }
@@ -161,6 +164,25 @@ export class display {
 
 	}
 
+	redraw = ()=>{
+		for(var gr of this.graphs){
+			gr.redessiner();
+		}
+	}
+}
+
+export class pDisplay {
+
+    constructor(target, param){
+		this.target = document.querySelector(target);
+		this.infoDiv = document.createElement('div');
+		this.infoDiv.id = 'sudevInfodiv';
+		this.target.appendChild(this.infoDiv);
+    }
+
+    display(ds){
+        this.makeTable2(ds);
+    }
 	makeTable2(dataset){
 		this.infoDiv.innerHTML = null;
 
@@ -210,38 +232,8 @@ export class display {
 			this.infoDiv.appendChild(details);
 		}
 
-	}
-	makeTable(dataset){
-		this.infoDiv.innerHTML = null;
+    }
 
-		// Main table
-
-		if(dataset.params){
-			var caption = document.createElement("caption");
-			caption.textContent = "Paramètres";
-
-			var t = table(dataset.params);
-
-			t.prepend(caption);
-			this.infoDiv.appendChild(t);
-		}
-
-		//Second table
-
-		if(dataset.unparsed){
-			var details = document.createElement('details');
-			var t2 = table(dataset.unparsed);
-			details.appendChild(t2);
-			this.infoDiv.appendChild(details);
-		}
-
-	}
-
-	redraw = ()=>{
-		for(var gr of this.graphs){
-			gr.redessiner();
-		}
-	}
 }
 
 function table(data){

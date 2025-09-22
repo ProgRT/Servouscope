@@ -1,4 +1,4 @@
-import {display} from './display.js';
+import {display, pDisplay} from './display.js';
 import {parseDataset} from './dataset.js';
 
 let defaults = {
@@ -43,6 +43,7 @@ export class sudev {
 		this.header.appendChild(templateClone);
 		
 		this.display = new display(target, this.dParams); 
+		this.pDisplay = new pDisplay(target, this.dParams); 
 
 		this.filesList = document.createElement('div');
 		this.filesList.id = 'sudevFilesList';
@@ -73,6 +74,7 @@ export class sudev {
                 dsbtn.disabled = true;
 
 				this.display.display(ds);
+				this.pDisplay.display(ds);
 			};
 
 			reader.readAsText(file);
@@ -80,46 +82,6 @@ export class sudev {
 		if(e.target.files.length == 0){this.target.classList.add("landing")}
 		else{this.target.classList.remove("landing")}
 	}
-
-    makeFilesTimeLine () {
-        let container = document.createElement('ul');
-        container.className = 'timeline';
-
-        let groups = Object.groupBy(this.datasets, f=>new Intl.DateTimeFormat().format(f.date))
-        for (let date in groups){
-            let label = document.createElement('li');
-            label.textContent = date;
-            container.append(label);
-            let sublist = document.createElement('ul');
-            for (let file of groups[date]) {
-                let label = document.createElement('li');
-                let hour = new Intl.DateTimeFormat(navigator.language, {hour: 'numeric', minute: 'numeric'}).format(file.date);
-                label.textContent = hour;
-                label.onclick = ()=>{
-                    this.display.display(file);
-                }
-                sublist.append(label);
-            }
-            container.append(sublist);
-        }
-        return container;
-    }
-
-    makeBtnList () {
-		this.filesList.innerHTML = null;
-
-		for(let ds of this.datasets){
-            var dsb = dataSetBlock(ds);
-            dsb.addEventListener('click', (e)=>{
-                for (var but of this.filesList.querySelectorAll('button')){
-                    but.disabled = false;
-                }
-                e.target.disabled = true;
-                this.display.display(ds);
-            });
-            this.filesList.appendChild(dsb);
-		}
-    }
 
     makeHorizontalTL () {
 		this.filesList.innerHTML = null;
@@ -151,30 +113,11 @@ export class sudev {
                     }
                     e.target.disabled = true;
                     this.display.display(ds);
+                    this.pDisplay.display(ds);
                 });
                 grpContent.append(btn);
             }
             this.filesList.appendChild(grpBlock);
         }
     }
-}
-
-function dataSetBlock(dataset){
-
-	var block = document.createElement("button");
-	block.className = "dataSetBlock";
-	block.innerHTML = '';
-
-	if(dataset.date){
-		block.innerHTML += dataset.date.toISOString().split(".")[0].replace("T", " ") + '<br/>';
-	}
-
-	if(dataset.mode){
-		block.innerHTML += dataset.mode;
-	}
-	else if (dataset.appareil){
-		block.innerHTML += dataset.appareil;
-	}
-
-	return block;
 }
