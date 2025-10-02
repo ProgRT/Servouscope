@@ -1,4 +1,6 @@
 import {display, pDisplay} from './display.js';
+//import {display as aDisplay} from '../simvent.js/src/animatedDisplay.js';
+//import {display as aDisplay} from 'https://progrt.github.io/simvent.js/src/animatedDisplay.js'
 import {parseDataset} from './dataset.js';
 
 let defaults = {
@@ -42,8 +44,26 @@ export class sudev {
 		let templateClone = logoTemplate.content.firstElementChild.cloneNode(true);
 		this.header.appendChild(templateClone);
 		
-		this.display = new display(target, this.dParams); 
+        if (this.displayStyle == 'aDisplay'){
+            let params = {
+                toolbar: this.header,
+                availableNumParams: [],
+                activeNumParams: ['Vt'],
+                datasets: ['PRESSION', 'DÉBIT'],
+                units: null
+            };
+            this.display = new aDisplay(params); 
+            console.log(this.display.units);
+
+        }
+
+        else { this.display = new display(target, this.dParams); }
+
 		this.pDisplay = new pDisplay(target, this.dParams); 
+
+        this.display.cursTblTarget = this.pDisplay.infoDiv;
+        this.display.infoDiv = this.pDisplay.infoDiv;
+
 
 		this.filesList = document.createElement('div');
 		this.filesList.id = 'sudevFilesList';
@@ -67,11 +87,12 @@ export class sudev {
 
                 if(this.multiple && nfiles > 1){
                     this.makeHorizontalTL();
-                }
 
-                let btnid = 'btn' + ds.fichier;
-                let dsbtn = document.getElementById(btnid);
-                dsbtn.disabled = true;
+                    let btnid = 'btn' + ds.fichier;
+                    let dsbtn = document.getElementById(btnid);
+                    dsbtn.disabled = true;
+
+                }
 
 				this.display.display(ds);
 				this.pDisplay.display(ds);

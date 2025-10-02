@@ -20,6 +20,7 @@
 <script src="./lib/d3.v3.min.js"></script>
 <script type="module">
 	import {sudev} from './mod/sudev.js';
+    import {parseDataset} from './mod/dataset.js';
 
     let params = new URLSearchParams(window.location.search);
     window.params = params;
@@ -32,11 +33,32 @@
 
     const conf = {
 		multiple: true, 
+        //displayStyle: 'aDisplay',
 		dParams: {
+            availableNumParams: [],
 			zoomable: params.has('zoomable'),
-			reducers: [dv]
+			reducers: [dv],
+            units: null
 		}
 	};
 
 	const disp = new sudev('body', conf);
+
+    if(params.has('demo')){
+        fetch('data/1546250546580.txt')
+            .then(responce=>responce.text())
+            .then(text => {
+                let ds = parseDataset(text);
+                console.log(ds.data[0]);
+
+                disp.display.display(ds.data.map(d=>{
+                    d.time = d.Time;
+                    return d;
+                }));
+                disp.pDisplay.display(ds);
+                disp.target.classList.remove('landing');
+                disp.display.redraw();
+            }
+            );
+    }
 </script>

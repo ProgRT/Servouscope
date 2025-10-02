@@ -87,10 +87,41 @@ body
       margin-top: 1px
       margin-bottom: 1px
 
+.waveformsContainer
+  height: calc(100vh - 70px)
+  padding: 0px 5px 0px 0px
+  width: 100%
+  display: flex
+  flex-shrink: 5
+  flex-direction: column
+
+  svg
+    height: 100%
+    width: 100%
+
+.cursCont
+  display: flex
+  align-items: space-between
+  gap: 10px
+  flex-wrap: wrap
+  padding: 5px
+
+.cursCtrl
+  margin: 0px
+  display: flex
+  align-items: center
+  flex-grow: 2
+  gap: 3px
+
+  input
+    flex-grow: 2
 body.landing
   display: flex
   flex-direction: column
   justify-content: center
+
+  button, a
+    display: none
 
   #sudevHeader
     display: flex

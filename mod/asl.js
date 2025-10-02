@@ -16,7 +16,7 @@ export function parseASL(string) {
 	return {
 		data: dataLines.map(parseData),
 		monitored: monitored,
-		appareil: 'ASL 5000'
+		model: 'ASL 5000'
 	};
 }
 

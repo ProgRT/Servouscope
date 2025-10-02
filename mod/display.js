@@ -1,5 +1,5 @@
-//import {graph} from '../graphsimple.js/graphsimple.js'
-import {graph} from 'https://progrt.github.io/graphsimple.js/graphsimple.js'
+import {graph} from '../graphsimple.js/graphsimple.js'
+//import {graph} from 'https://progrt.github.io/graphsimple.js/graphsimple.js'
 import {drange} from './drange.js'
 
 let defaults = {
@@ -42,30 +42,19 @@ export class display {
 	}
 
 	display(dataset){
-		//console.table(dataset.monitored);
 		this.dataset = dataset;
-		//this.fx = d => (d.Durée.getTime() - dataset.date.getTime())/1000;
 		this.fx = d=>d.Time;
 
-		//let availableParams = dataset.monitoredParams.map(d=>d.split(' ')[0]);
-		var availableParams = dataset.monitored.map(d=>d.id);
 		this.plotable = dataset.monitored.filter(d=>this.params.includes(d.id));
 		
 		this.graphs = [];
 		this.graphDiv.innerHTML = null;
 
-		for(let p of this.plotable){
-			this.makeGraph(dataset, p);
-		}
+		for(let p of this.plotable) this.makeGraph(dataset, p);
 
 		if(this.zoomable){this.createPager()}
 
-		//this.makeTable(dataset);
-		//this.makeTable2(dataset);
-
-        for (let g of this.graphs) {
-            g.redessiner();
-        }
+        for (let g of this.graphs)  g.redessiner();
 	}
 
 	createPager(){
@@ -183,7 +172,9 @@ export class pDisplay {
     display(ds){
         this.makeTable2(ds);
     }
+
 	makeTable2(dataset){
+        console.log(dataset.date);
 		this.infoDiv.innerHTML = null;
 
         // Info table
@@ -194,7 +185,9 @@ export class pDisplay {
             ['Fichier', dataset.fichier],
             ['Date', dfmt.format(dataset.date)],
             ['Heure', tfmt.format(dataset.date)],
+            ['Appareil', dataset.model],
         ];
+        if(dataset.serial) info.push(['Numérot', dataset.serial]);
         if(dataset.mode) info.push(['Mode', dataset.mode]);
         var details = document.createElement('details');
         let summary = document.createElement("summary");
